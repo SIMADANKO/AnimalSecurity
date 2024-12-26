@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
  * @since 2024-12-07
  */
 @Controller
-@RequestMapping("/system/vendors")
+@RequestMapping("/vendors")
 public class VendorsController {
 
 }
