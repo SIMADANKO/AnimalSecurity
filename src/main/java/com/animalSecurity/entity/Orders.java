@@ -26,8 +26,14 @@ public class Orders implements Serializable {
     @TableId(value = "order_id", type = IdType.AUTO)
     private Integer orderId;
 
+    @ApiModelProperty("用户ID，外键关联用户表")
+    private Integer userId;
+
     @ApiModelProperty("宠物ID，外键关联宠物表")
     private Integer petId;
+
+    @ApiModelProperty("商家ID，外键关联商家表")
+    private Integer vendorId;
 
     @ApiModelProperty("保险产品ID")
     private Integer policyId;
@@ -122,18 +128,36 @@ public class Orders implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    public Integer getVendorId() {
+        return vendorId;
+    }
+
+    public void setVendorId(Integer vendorId) {
+        this.vendorId = vendorId;
+    }
+
     @Override
     public String toString() {
         return "Orders{" +
-            "orderId = " + orderId +
-            ", petId = " + petId +
-            ", policyId = " + policyId +
-            ", orderStatus = " + orderStatus +
-            ", totalPrice = " + totalPrice +
-            ", startDate = " + startDate +
-            ", endDate = " + endDate +
-            ", createTime = " + createTime +
-            ", updateTime = " + updateTime +
-        "}";
+                "orderId=" + orderId +
+                ", userId=" + userId +
+                ", petId=" + petId +
+                ", vendorId=" + vendorId +
+                ", policyId=" + policyId +
+                ", orderStatus='" + orderStatus + '\'' +
+                ", totalPrice=" + totalPrice +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
