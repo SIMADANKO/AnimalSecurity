@@ -33,17 +33,17 @@ public class Users implements Serializable {
     @ApiModelProperty("邮箱")
     private String email;
 
-    @ApiModelProperty("联系电话")
-    private String phone;
-
-    @ApiModelProperty("联系地址")
-    private String address;
-
-    @ApiModelProperty("记录创建时间")
-    private LocalDateTime createTime;
-
-    @ApiModelProperty("记录更新时间")
-    private LocalDateTime updateTime;
+//    @ApiModelProperty("联系电话")
+//    private String phone;
+//
+//    @ApiModelProperty("联系地址")
+//    private String address;
+//
+//    @ApiModelProperty("记录创建时间")
+//    private LocalDateTime createTime;
+//
+//    @ApiModelProperty("记录更新时间")
+//    private LocalDateTime updateTime;
 
     public Integer getUserId() {
         return userId;
@@ -77,37 +77,37 @@ public class Users implements Serializable {
         this.email = email;
     }
 
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
+//    public String getPhone() {
+//        return phone;
+//    }
+//
+//    public void setPhone(String phone) {
+//        this.phone = phone;
+//    }
+//
+//    public String getAddress() {
+//        return address;
+//    }
+//
+//    public void setAddress(String address) {
+//        this.address = address;
+//    }
+//
+//    public LocalDateTime getCreateTime() {
+//        return createTime;
+//    }
+//
+//    public void setCreateTime(LocalDateTime createTime) {
+//        this.createTime = createTime;
+//    }
+//
+//    public LocalDateTime getUpdateTime() {
+//        return updateTime;
+//    }
+//
+//    public void setUpdateTime(LocalDateTime updateTime) {
+//        this.updateTime = updateTime;
+//    }
 
     @Override
     public String toString() {
@@ -116,10 +116,10 @@ public class Users implements Serializable {
             ", username = " + username +
             ", password = " + password +
             ", email = " + email +
-            ", phone = " + phone +
-            ", address = " + address +
-            ", createTime = " + createTime +
-            ", updateTime = " + updateTime +
+//            ", phone = " + phone +
+//            ", address = " + address +
+//            ", createTime = " + createTime +
+//            ", updateTime = " + updateTime +
         "}";
     }
 }
