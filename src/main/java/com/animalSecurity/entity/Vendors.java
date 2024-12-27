@@ -24,6 +24,9 @@ public class Vendors implements Serializable {
     @TableId(value = "vendor_id", type = IdType.AUTO)
     private Integer vendorId;
 
+    @ApiModelProperty("商家账户密码")
+    private String password;
+
     @ApiModelProperty("商家名称")
     private String vendorName;
 
@@ -98,16 +101,25 @@ public class Vendors implements Serializable {
         this.updateTime = updateTime;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "Vendors{" +
-            "vendorId = " + vendorId +
-            ", vendorName = " + vendorName +
-            ", contactEmail = " + contactEmail +
-            ", contactPhone = " + contactPhone +
-            ", address = " + address +
-            ", createTime = " + createTime +
-            ", updateTime = " + updateTime +
-        "}";
+                "vendorId=" + vendorId +
+                ", password='" + password + '\'' +
+                ", vendorName='" + vendorName + '\'' +
+                ", contactEmail='" + contactEmail + '\'' +
+                ", contactPhone='" + contactPhone + '\'' +
+                ", address='" + address + '\'' +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
     }
 }
