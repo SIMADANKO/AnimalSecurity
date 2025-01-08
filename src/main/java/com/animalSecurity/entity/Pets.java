@@ -43,17 +43,7 @@ public class Pets implements Serializable {
     @ApiModelProperty("宠物性别")
     private String gender;
 
-    @ApiModelProperty("宠物体重（单位：公斤）")
-    private BigDecimal weight;
 
-    @ApiModelProperty("健康状况描述")
-    private String healthStatus;
-
-    @ApiModelProperty("记录创建时间")
-    private LocalDateTime createTime;
-
-    @ApiModelProperty("记录更新时间")
-    private LocalDateTime updateTime;
 
     public Integer getPetId() {
         return petId;
@@ -111,37 +101,6 @@ public class Pets implements Serializable {
         this.gender = gender;
     }
 
-    public BigDecimal getWeight() {
-        return weight;
-    }
-
-    public void setWeight(BigDecimal weight) {
-        this.weight = weight;
-    }
-
-    public String getHealthStatus() {
-        return healthStatus;
-    }
-
-    public void setHealthStatus(String healthStatus) {
-        this.healthStatus = healthStatus;
-    }
-
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
 
     @Override
     public String toString() {
@@ -153,10 +112,7 @@ public class Pets implements Serializable {
             ", breed = " + breed +
             ", age = " + age +
             ", gender = " + gender +
-            ", weight = " + weight +
-            ", healthStatus = " + healthStatus +
-            ", createTime = " + createTime +
-            ", updateTime = " + updateTime +
+
         "}";
     }
 }
