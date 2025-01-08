@@ -1,6 +1,7 @@
 package com.animalSecurity.controller;
 
 import com.animalSecurity.entity.Orders;
+import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IOrdersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -25,40 +26,50 @@ public class OrdersController {
 
     // 用户：查询当前用户的所有订单
     @GetMapping
-    public List<Orders> getAllOrders(Authentication authentication) {
+    public Result<List<Orders>> getAllOrders(Authentication authentication) {
         // 从 Authentication 获取当前用户的 ID
         Integer userId = Integer.parseInt(authentication.getName());
-        return orderService.getAllOrdersByUserId(userId);
+        List<Orders> orders = orderService.getAllOrdersByUserId(userId);
+        if (orders != null && !orders.isEmpty()) {
+            return Result.success(orders);
+        }
+        return Result.fail(404, "No orders found for the current user.");
     }
 
     // 用户：查看订单详情
     @GetMapping("/{id}")
-    public Orders getOrderById(@PathVariable Integer id) {
-        return orderService.getOrderById(id);
+    public Result<Orders> getOrderById(@PathVariable Integer id) {
+        Orders order = orderService.getOrderById(id);
+        if (order != null) {
+            return Result.success(order);
+        }
+        return Result.fail(404, "Order not found.");
     }
 
     // 用户：创建新订单
     @PostMapping
-    public String createOrder(@RequestBody Orders order, Authentication authentication) {
+    public Result<String> createOrder(@RequestBody Orders order, Authentication authentication) {
         // 从 Authentication 获取当前用户的 ID
         Integer userId = Integer.parseInt(authentication.getName());
         order.setOrderStatus("Pending");
         order.setUserId(userId); // 设置用户 ID
-        if (orderService.createOrder(order)) {
-            return "Order created successfully!";
+        boolean success = orderService.createOrder(order);
+        if (success) {
+            return Result.success("Order created successfully!");
         }
-        return "Failed to create order.";
+        return Result.fail(500, "Failed to create order.");
     }
 
     // 管理员：更新订单状态
     @PutMapping("/{id}/status")
-    public String updateOrderStatus(@PathVariable Integer id,
-                                    @RequestParam String status,
-                                    Authentication authentication) {
+    public Result<String> updateOrderStatus(@PathVariable Integer id,
+                                            @RequestParam String status,
+                                            Authentication authentication) {
         Integer vendorId = Integer.parseInt(authentication.getName());
-        if (orderService.updateOrderStatus(id, status, vendorId)) {
-            return "Order status updated successfully!";
+        boolean success = orderService.updateOrderStatus(id, status, vendorId);
+        if (success) {
+            return Result.success("Order status updated successfully!");
         }
-        return "Failed to update order status.";
+        return Result.fail(500, "Failed to update order status.");
     }
 }

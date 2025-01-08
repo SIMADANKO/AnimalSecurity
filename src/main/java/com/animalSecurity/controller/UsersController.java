@@ -20,17 +20,18 @@ import org.springframework.stereotype.Controller;
  * @author lu
  * @since 2024-12-07
  */
-@Controller
+@RestController
 @RequestMapping("/users")
 public class UsersController {
+
     @Autowired
     private IUsersService userService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    // 用户登录
     @PostMapping("/login")
-    @ResponseBody
     public Result<String> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) {
         try {
             // 使用 Spring Security 进行认证
@@ -48,43 +49,40 @@ public class UsersController {
             return Result.success("Login successful");
         } catch (Exception e) {
             // 捕获异常并返回失败消息
-            return Result.fail("Invalid credentials");
+            return Result.fail(401, "Invalid credentials");
         }
     }
 
-
     // 用户注册
     @PostMapping("/register")
-    @ResponseBody
-    public String register(@RequestBody Users user) {
+    public Result<String> register(@RequestBody Users user) {
         boolean isRegistered = userService.register(user);
         if (isRegistered) {
-            return "Registration successful!";
+            return Result.success("Registration successful!");
         } else {
-            return "Registration failed! Username already exists.";
+            return Result.fail(400, "Registration failed! Username already exists.");
         }
     }
 
     // 密码找回
     @PostMapping("/forgot-password")
-    @ResponseBody
-    public String forgotPassword(@RequestParam String username) {
+    public Result<String> forgotPassword(@RequestParam String username) {
         boolean result = userService.sendPasswordResetLink(username);
         if (result) {
-            return "Password reset link sent!";
+            return Result.success("Password reset link sent!");
         } else {
-            return "User not found!";
+            return Result.fail(404, "User not found!");
         }
     }
 
+    // 更新用户信息
     @PutMapping("/update")
-    @ResponseBody
-    public String updateUserInfo(@RequestBody Users user) {
+    public Result<String> updateUserInfo(@RequestBody Users user) {
         boolean result = userService.updateUserInfo(user);
         if (result) {
-            return "User information updated successfully!";
+            return Result.success("User information updated successfully!");
         } else {
-            return "Failed to update user information!";
+            return Result.fail(500, "Failed to update user information!");
         }
     }
-    }
+}

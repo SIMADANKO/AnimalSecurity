@@ -1,6 +1,7 @@
 package com.animalSecurity.controller;
 
 import com.animalSecurity.entity.Policy;
+import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IPolicyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,44 +26,55 @@ public class PolicyController {
 
     // 用户：查看所有保险产品
     @GetMapping
-    public List<Policy> getAllPolicies() {
-        return policyService.getAllPolicies();
+    public Result<List<Policy>> getAllPolicies() {
+        List<Policy> policies = policyService.getAllPolicies();
+        if (policies != null && !policies.isEmpty()) {
+            return Result.success(policies);
+        }
+        return Result.fail(404, "No policies found.");
     }
 
     // 用户：查看保险产品详情
     @GetMapping("/{id}")
-    public Policy getPolicyById(@PathVariable int id) {
-        return policyService.getPolicyById(id);
+    public Result<Policy> getPolicyById(@PathVariable int id) {
+        Policy policy = policyService.getPolicyById(id);
+        if (policy != null) {
+            return Result.success(policy);
+        }
+        return Result.fail(404, "Policy not found.");
     }
 
     // 管理员：添加保险产品
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public String addPolicy(@RequestBody Policy policy) {
-        if (policyService.addPolicy(policy)) {
-            return "Policy added successfully!";
+    public Result<String> addPolicy(@RequestBody Policy policy) {
+        boolean success = policyService.addPolicy(policy);
+        if (success) {
+            return Result.success("Policy added successfully!");
         }
-        return "Failed to add policy.";
+        return Result.fail(500, "Failed to add policy.");
     }
 
     // 管理员：更新保险产品信息
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public String updatePolicy(@PathVariable int id, @RequestBody Policy policy) {
+    public Result<String> updatePolicy(@PathVariable int id, @RequestBody Policy policy) {
         policy.setPolicyId(id);
-        if (policyService.updatePolicy(policy)) {
-            return "Policy updated successfully!";
+        boolean success = policyService.updatePolicy(policy);
+        if (success) {
+            return Result.success("Policy updated successfully!");
         }
-        return "Failed to update policy.";
+        return Result.fail(500, "Failed to update policy.");
     }
 
     // 管理员：删除保险产品
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public String deletePolicy(@PathVariable int id) {
-        if (policyService.deletePolicy(id)) {
-            return "Policy deleted successfully!";
+    public Result<String> deletePolicy(@PathVariable int id) {
+        boolean success = policyService.deletePolicy(id);
+        if (success) {
+            return Result.success("Policy deleted successfully!");
         }
-        return "Failed to delete policy.";
+        return Result.fail(500, "Failed to delete policy.");
     }
 }
