@@ -27,7 +27,7 @@ public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IP
     @Override
     public List<Pets> getPetsByUserId(String userId) {
         QueryWrapper<Pets> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("owner_id", userId); // 假设表中有 owner_id 字段表示用户 ID
+        queryWrapper.eq("user_id", userId);
         return petMapper.selectList(queryWrapper);
     }
 

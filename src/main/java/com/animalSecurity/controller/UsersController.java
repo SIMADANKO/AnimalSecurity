@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.Map;
+
 /**
  * <p>
  * 用户表 前端控制器
@@ -30,25 +32,32 @@ public class UsersController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    // 用户登录
     @PostMapping("/login")
-    public Result<String> login(@RequestParam String username, @RequestParam String password, HttpServletResponse response) {
+    public Result<String> login(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
+        String username = requestBody.get("username");
+        String password = requestBody.get("password");
+
+        System.out.println("Received username: " + username);  // 打印接收到的用户名
+        System.out.println("Received password: " + password);  // 打印接收到的密码
+
         try {
-            // 使用 Spring Security 进行认证
+            // 手动进行认证
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
+            // 打印认证信息
+            System.out.println("Authentication successful: " + authentication);
+
             // 登录成功后生成 JWT
-            String token = JwtUtil.generateToken(String.valueOf(authentication));
+            String token = JwtUtil.generateToken(username);  // 自定义方法生成 JWT
 
             // 将 JWT 设置到响应头中
             response.setHeader("Authorization", "Bearer " + token);
 
-            // 返回统一响应
             return Result.success("Login successful");
         } catch (Exception e) {
-            // 捕获异常并返回失败消息
+            e.printStackTrace();
             return Result.fail(401, "Invalid credentials");
         }
     }

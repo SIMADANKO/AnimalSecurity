@@ -32,7 +32,7 @@ public class VendorsController {
         return Result.fail(400, "Vendor name already exists!");
     }
 
-    // 商家登录
+     //商家登录
     @PostMapping("/login")
     public Result<String> login(@RequestParam String vendorName, @RequestParam String password) {
         String token = vendorService.loginVendor(vendorName, password);

@@ -17,14 +17,14 @@ import java.util.List;
  * @author lu
  * @since 2024-12-07
  */
-@Controller
+@RestController
 @RequestMapping("/pets")
 public class PetsController {
     @Autowired
     private IPetsService petService;
 
     // 用户：根据用户ID获取宠物列表
-    @GetMapping
+    @GetMapping("/list")
     public Result<List<Pets>> getPetsByUserId(@RequestParam String userId) {
         List<Pets> pets = petService.getPetsByUserId(userId);
         if (pets != null && !pets.isEmpty()) {

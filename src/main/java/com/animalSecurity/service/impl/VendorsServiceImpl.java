@@ -51,7 +51,11 @@ public class VendorsServiceImpl extends ServiceImpl<VendorsMapper, Vendors> impl
 
         if (vendor != null && passwordEncoder.matches(password, vendor.getPassword())) {
             // 生成JWT token
-            return jwtUtils.generateToken(vendor.getVendorId().toString());
+            try {
+                return jwtUtils.generateToken(vendor.getVendorId().toString());
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         return null; // 登录失败
     }
