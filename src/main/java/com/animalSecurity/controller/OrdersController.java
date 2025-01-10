@@ -1,14 +1,12 @@
 package com.animalSecurity.controller;
-
 import com.animalSecurity.entity.Orders;
 import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IOrdersService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
 
-import java.util.List;
 
 /**
  * <p>
@@ -26,12 +24,19 @@ public class OrdersController {
 
     // 用户：查询当前用户的所有订单
     @GetMapping
-    public Result<List<Orders>> getAllOrders(Authentication authentication) {
+    public Result<Page<Orders>> getAllOrders(
+            @RequestParam Integer page,
+            @RequestParam Integer size,
+            Authentication authentication) {
+
         // 从 Authentication 获取当前用户的 ID
         Integer userId = Integer.parseInt(authentication.getName());
-        List<Orders> orders = orderService.getAllOrdersByUserId(userId);
-        if (orders != null && !orders.isEmpty()) {
-            return Result.success(orders);
+
+        // 调用服务层方法进行分页查询
+        Page<Orders> ordersPage = orderService.getAllOrdersByUserId(userId, page, size);
+
+        if (ordersPage != null && !ordersPage.getRecords().isEmpty()) {
+            return Result.success(ordersPage);
         }
         return Result.fail(404, "No orders found for the current user.");
     }

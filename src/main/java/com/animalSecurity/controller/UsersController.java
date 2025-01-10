@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
@@ -31,6 +32,9 @@ public class UsersController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public Result<String> login(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
@@ -64,7 +68,13 @@ public class UsersController {
 
     // 用户注册
     @PostMapping("/register")
-    public Result<String> register(@RequestBody Users user) {
+    public Result<String> register(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
+        Users user = new Users();
+        user.setUsername(requestBody.get("username"));
+        String encodedPassword = passwordEncoder.encode(requestBody.get("password"));
+        user.setPassword(encodedPassword);
+        user.setEmail(requestBody.get("email"));
+
         boolean isRegistered = userService.register(user);
         if (isRegistered) {
             return Result.success("Registration successful!");

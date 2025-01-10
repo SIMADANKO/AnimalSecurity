@@ -27,6 +27,7 @@ public class Vendors implements Serializable {
     @ApiModelProperty("商家账户密码")
     private String password;
 
+
     @ApiModelProperty("商家名称")
     private String vendorName;
 
@@ -44,6 +45,9 @@ public class Vendors implements Serializable {
 
     @ApiModelProperty("记录更新时间")
     private LocalDateTime updateTime;
+
+    @ApiModelProperty("角色")
+    private String role;
 
     public Integer getVendorId() {
         return vendorId;
@@ -109,6 +113,14 @@ public class Vendors implements Serializable {
         this.password = password;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "Vendors{" +
@@ -120,6 +132,7 @@ public class Vendors implements Serializable {
                 ", address='" + address + '\'' +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
+                ", role='" + role + '\'' +
                 '}';
     }
 }

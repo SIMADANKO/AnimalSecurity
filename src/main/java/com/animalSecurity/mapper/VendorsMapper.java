@@ -1,7 +1,9 @@
 package com.animalSecurity.mapper;
+import com.animalSecurity.entity.Users;
 import com.animalSecurity.entity.Vendors;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 
 /**
@@ -14,5 +16,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 
 public interface VendorsMapper extends BaseMapper<Vendors> {
-
+    @Select("SELECT * FROM vendors WHERE vendor_name = #{vendorname}")
+    Vendors selectByVendorname(String vendorname);
 }

@@ -3,6 +3,7 @@ package com.animalSecurity.controller;
 import com.animalSecurity.entity.Pets;
 import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IPetsService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
@@ -23,12 +24,22 @@ public class PetsController {
     @Autowired
     private IPetsService petService;
 
-    // 用户：根据用户ID获取宠物列表
+    // 用户：根据用户ID获取宠物分页列表
     @GetMapping("/list")
-    public Result<List<Pets>> getPetsByUserId(@RequestParam String userId) {
-        List<Pets> pets = petService.getPetsByUserId(userId);
-        if (pets != null && !pets.isEmpty()) {
-            return Result.success(pets);
+    public Result<Page<Pets>> getPetsByUserId(
+            @RequestParam String userId,
+            @RequestParam Integer page,
+            @RequestParam Integer size) {
+
+        // 创建分页对象
+        Page<Pets> pageParam = new Page<>(page, size);
+
+        // 调用 service 层方法获取分页数据
+        Page<Pets> petsPage = petService.getPetsByUserId(userId, pageParam);
+
+        // 判断是否有数据并返回结果
+        if (petsPage != null && !petsPage.getRecords().isEmpty()) {
+            return Result.success(petsPage);
         }
         return Result.fail(404, "No pets found for the user.");
     }

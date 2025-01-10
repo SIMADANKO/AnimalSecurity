@@ -33,6 +33,9 @@ public class Users implements Serializable {
     @ApiModelProperty("邮箱")
     private String email;
 
+    @ApiModelProperty("角色")
+    private String role;
+
 //    @ApiModelProperty("联系电话")
 //    private String phone;
 //
@@ -109,17 +112,23 @@ public class Users implements Serializable {
 //        this.updateTime = updateTime;
 //    }
 
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     @Override
     public String toString() {
         return "Users{" +
-            "userId = " + userId +
-            ", username = " + username +
-            ", password = " + password +
-            ", email = " + email +
-//            ", phone = " + phone +
-//            ", address = " + address +
-//            ", createTime = " + createTime +
-//            ", updateTime = " + updateTime +
-        "}";
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", role='" + role + '\'' +
+                '}';
     }
 }

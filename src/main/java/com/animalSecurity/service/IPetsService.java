@@ -1,6 +1,7 @@
 package com.animalSecurity.service;
 
 import com.animalSecurity.entity.Pets;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  */
 public interface IPetsService extends IService<Pets> {
 
-    List<Pets> getPetsByUserId(String userId);// 查询所有宠物
+    Page<Pets> getPetsByUserId(String userId, Page<Pets> page);// 查询所有宠物
 
     boolean addPet(Pets pet);              // 添加宠物
 

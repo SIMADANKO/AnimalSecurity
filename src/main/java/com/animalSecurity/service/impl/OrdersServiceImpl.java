@@ -4,6 +4,7 @@ import com.animalSecurity.entity.Orders;
 import com.animalSecurity.mapper.OrdersMapper;
 import com.animalSecurity.service.IOrdersService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,13 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     @Autowired
     private OrdersMapper orderMapper;
 
-    @Override
-    public List<Orders> getAllOrdersByUserId(Integer userId) {
-        QueryWrapper<Orders> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId);
-        return orderMapper.selectList(queryWrapper); // 查询用户的所有订单
+    public Page<Orders> getAllOrdersByUserId(Integer userId, int page, int size) {
+        // 创建 Page 对象，page 表示当前页，size 表示每页大小
+        Page<Orders> pageParam = new Page<>(page, size);
+
+        // 使用 MyBatis-Plus 提供的分页查询方法
+        return orderMapper.selectPage(pageParam,
+                new QueryWrapper<Orders>().eq("user_id", userId));
     }
 
     @Override
@@ -54,4 +57,6 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         }
         return false;
     }
+
+
 }

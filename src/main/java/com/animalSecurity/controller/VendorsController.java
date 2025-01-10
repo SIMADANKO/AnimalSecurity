@@ -6,7 +6,7 @@ import com.animalSecurity.service.IVendorsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.stereotype.Controller;
+
 
 /**
  * <p>
@@ -23,24 +23,6 @@ public class VendorsController {
     @Autowired
     private IVendorsService vendorService;
 
-    // 商家注册
-    @PostMapping("/register")
-    public Result<String> register(@RequestBody Vendors vendor) {
-        if (vendorService.registerVendor(vendor)) {
-            return Result.success("Registration successful!");
-        }
-        return Result.fail(400, "Vendor name already exists!");
-    }
-
-     //商家登录
-    @PostMapping("/login")
-    public Result<String> login(@RequestParam String vendorName, @RequestParam String password) {
-        String token = vendorService.loginVendor(vendorName, password);
-        if (token != null) {
-            return Result.success("Login successful! Token: " + token);
-        }
-        return Result.fail(401, "Invalid vendor name or password.");
-    }
 
     // 查看商家信息
     @GetMapping("/info")

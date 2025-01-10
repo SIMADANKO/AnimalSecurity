@@ -4,6 +4,7 @@ import com.animalSecurity.entity.Pets;
 import com.animalSecurity.mapper.PetsMapper;
 import com.animalSecurity.service.IPetsService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,13 @@ public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IP
     private PetsMapper petMapper;
 
     //查询当前用户所有宠物
-    @Override
-    public List<Pets> getPetsByUserId(String userId) {
+    public Page<Pets> getPetsByUserId(String userId, Page<Pets> page) {
+        // 创建查询条件
         QueryWrapper<Pets> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", userId);
-        return petMapper.selectList(queryWrapper);
+        queryWrapper.eq("user_id", userId);  // 根据 userId 查询
+
+        // 使用 MyBatis-Plus 的分页查询方法
+        return petMapper.selectPage(page, queryWrapper);
     }
 
     // 添加宠物
