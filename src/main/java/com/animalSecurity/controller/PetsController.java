@@ -5,6 +5,7 @@ import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IPetsService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
@@ -27,9 +28,12 @@ public class PetsController {
     // 用户：根据用户ID获取宠物分页列表
     @GetMapping("/list")
     public Result<Page<Pets>> getPetsByUserId(
-            @RequestParam String userId,
             @RequestParam Integer page,
-            @RequestParam Integer size) {
+            @RequestParam Integer size,
+            Authentication authentication) {
+
+        // 从 Token (Authentication) 中获取当前用户的 ID
+        String userId = authentication.getName();
 
         // 创建分页对象
         Page<Pets> pageParam = new Page<>(page, size);
