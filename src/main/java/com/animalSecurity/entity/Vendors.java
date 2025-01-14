@@ -34,17 +34,17 @@ public class Vendors implements Serializable {
     @ApiModelProperty("联系邮箱")
     private String contactEmail;
 
-    @ApiModelProperty("联系电话")
-    private String contactPhone;
-
-    @ApiModelProperty("商家地址")
-    private String address;
-
-    @ApiModelProperty("记录创建时间")
-    private LocalDateTime createTime;
-
-    @ApiModelProperty("记录更新时间")
-    private LocalDateTime updateTime;
+//    @ApiModelProperty("联系电话")
+//    private String contactPhone;
+//
+//    @ApiModelProperty("商家地址")
+//    private String address;
+//
+//    @ApiModelProperty("记录创建时间")
+//    private LocalDateTime createTime;
+//
+//    @ApiModelProperty("记录更新时间")
+//    private LocalDateTime updateTime;
 
     @ApiModelProperty("角色")
     private String role;
@@ -73,37 +73,37 @@ public class Vendors implements Serializable {
         this.contactEmail = contactEmail;
     }
 
-    public String getContactPhone() {
-        return contactPhone;
-    }
-
-    public void setContactPhone(String contactPhone) {
-        this.contactPhone = contactPhone;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
-    }
-
-    public LocalDateTime getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(LocalDateTime updateTime) {
-        this.updateTime = updateTime;
-    }
+//    public String getContactPhone() {
+//        return contactPhone;
+//    }
+//
+//    public void setContactPhone(String contactPhone) {
+//        this.contactPhone = contactPhone;
+//    }
+//
+//    public String getAddress() {
+//        return address;
+//    }
+//
+//    public void setAddress(String address) {
+//        this.address = address;
+//    }
+//
+//    public LocalDateTime getCreateTime() {
+//        return createTime;
+//    }
+//
+//    public void setCreateTime(LocalDateTime createTime) {
+//        this.createTime = createTime;
+//    }
+//
+//    public LocalDateTime getUpdateTime() {
+//        return updateTime;
+//    }
+//
+//    public void setUpdateTime(LocalDateTime updateTime) {
+//        this.updateTime = updateTime;
+//    }
 
     public String getPassword() {
         return password;
@@ -128,10 +128,10 @@ public class Vendors implements Serializable {
                 ", password='" + password + '\'' +
                 ", vendorName='" + vendorName + '\'' +
                 ", contactEmail='" + contactEmail + '\'' +
-                ", contactPhone='" + contactPhone + '\'' +
-                ", address='" + address + '\'' +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
+//                ", contactPhone='" + contactPhone + '\'' +
+//                ", address='" + address + '\'' +
+//                ", createTime=" + createTime +
+//                ", updateTime=" + updateTime +
                 ", role='" + role + '\'' +
                 '}';
     }
