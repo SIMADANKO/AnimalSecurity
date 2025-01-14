@@ -1,0 +1,540 @@
+<template>
+  <div id="app">
+  
+
+    <div class="container">
+      <el-tabs v-model="activeTab" class="custom-tabs">
+        <el-tab-pane label="私のペット" name="pets">
+          <div class="page-header">
+            <h2 class="section-title">私のペットリスト</h2>
+            <el-button type="primary" @click="showAddPetDialog" class="add-pet-btn">
+              <i class="el-icon-plus"></i> ペットを追加する
+            </el-button>
+          </div>
+
+          <div class="pet-grid">
+            <div v-for="pet in pets" :key="pet.petId" class="pet-card">
+              <div class="pet-card-header">
+                <div class="pet-avatar">
+                  <i class="el-icon-pet"></i>
+                </div>
+                <h3 class="pet-name">{{ pet.petName }}</h3>
+              </div>
+              
+              <div class="pet-info">
+                <div class="info-item">
+                  <span class="label">品種：</span>
+                  <span class="value">{{ pet.breed }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">種類：</span>
+                  <span class="value">{{ pet.species }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">性別：</span>
+                  <span class="value">{{ pet.gender === 'Female' ? '母' : '公' }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">年齢：</span>
+                  <span class="value">{{ pet.age }}歳</span>
+                </div>
+              </div>
+
+              <div class="insurance-status">
+                 <!-- 根据 pet.insuranceStatus 来判断保险状态，使用三元表达式 -->
+  <div class="status-tag" :class="pet.insuranceStatus === 'active' ? 'active' : 'inactive'">
+    {{ pet.insuranceStatus === 'active' ? '保険に加入済み' : '未加入保険' }}
+  </div>
+                <p class="expiry-date" v-if="pet.expiryDate">到期时间：{{ pet.expiryDate }}</p>
+              </div>
+
+              <div class="pet-actions">
+  <!-- 如果保险状态是inactive或没有保险，则显示购买保险按钮 -->
+  <el-button 
+    type="primary" 
+    class="action-btn"
+    @click="buyInsurance(pet)" 
+    v-if="pet.insuranceStatus !== 'active'">
+    保険を購入する
+  </el-button>
+
+  <!-- 如果保险状态是active，则显示更新保险按钮 -->
+  <!-- <el-button 
+    type="success" 
+    class="action-btn"
+    @click="renewInsurance(pet)" 
+    v-else>
+    保険を更新する
+  </el-button> -->
+</div>
+            </div>
+          </div>
+        </el-tab-pane>
+
+        <el-tab-pane label="保険プラン" name="plans">
+          <div class="page-header">
+            <h2 class="section-title">選択可能な保険プラン</h2>
+          </div>
+
+          <div class="plans-grid">
+            <div v-for="plan in insurancePlans" :key="plan.policyId" class="plan-card">
+              <div class="plan-header">
+                <h3>{{ plan.policyName }}</h3>
+                <div class="premium">¥{{ plan.premium }}<span>/年</span></div>
+              </div>
+              
+              <div class="plan-content">
+                <p class="description">{{ plan.description || '无描述' }}</p>
+                <div class="coverage">
+                  <span class="coverage-label">保障範囲</span>
+                  <span class="coverage-amount">¥{{ plan.coverage }}</span>
+                </div>
+              </div>
+
+              <el-button 
+                type="primary" 
+                class="select-plan-btn" 
+                @click="selectPlan(plan)">
+                このプランを選択する
+              </el-button>
+            </div>
+          </div>
+        </el-tab-pane>
+      </el-tabs>
+
+      <!-- 添加宠物对话框 -->
+      <el-dialog 
+        v-model="addPetDialogVisible" 
+        title="ペットを追加する" 
+        custom-class="pet-dialog"
+        width="500px"
+      >
+        <el-form :model="newPet" label-width="100px" class="pet-form">
+          <el-form-item label="名前">
+            <el-input v-model="newPet.name" placeholder="请输入宠物名称"></el-input>
+          </el-form-item>
+          <el-form-item label="品種">
+            <el-input v-model="newPet.breed" placeholder="请输入品种"></el-input>
+          </el-form-item>
+          <el-form-item label="種類">
+            <el-input v-model="newPet.species" placeholder="请输入种类"></el-input>
+          </el-form-item>
+          <el-form-item label="年齢">
+            <el-input-number 
+              v-model="newPet.age" 
+              :min="0" 
+              :max="20"
+              controls-position="right">
+            </el-input-number>
+          </el-form-item>
+          <el-form-item label="性别">
+            <el-select v-model="newPet.gender" placeholder="性别を選びなさい">
+              <el-option label="雄性" value="1"></el-option>
+              <el-option label="雌性" value="2"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="addPetDialogVisible = false">キャンセル</el-button>
+            <el-button type="primary" @click="addPet">確認</el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+  </div>
+</template>
+
+<script>
+// Script部分保持不变
+import axios from 'axios';
+import { ref, reactive, onMounted,watch} from 'vue';
+import { ElMessage } from 'element-plus';
+
+export default {
+  name: 'PetInsuranceSystem',
+  setup() {
+    const title = ref('ペット保険システム');
+    const activeTab = ref('pets');
+    const addPetDialogVisible = ref(false);
+
+    const pets = ref([]);
+    const insurancePlans = ref([]);
+
+    const newPet = reactive({
+      name: '',
+      species: '',
+      breed: '',
+      age: 1,
+      gender: '',
+      insuranceStatus:''
+    });
+
+    watch(activeTab, (newTab) => {
+      if (newTab === 'pets') {
+        fetchPets(); // 当 tab 切换到 "私のペット" 时执行 fetchPets
+      }
+    });
+
+    const fetchPets = async () => {
+      try {
+        
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const response = await axios.get('http://localhost:8081/pets/list?page=1&size=10', {
+          
+          headers: {
+            Authorization: `Bearer ${token}`,
+            withCredentials: true
+          }
+        });
+        
+        pets.value = response.data.data.records;
+        console.log(pets.value);
+      } catch (error) {
+        ElMessage.error('ペットデータの取得に失敗しました');
+        console.log(error);
+      }
+
+      sessionStorage.removeItem('selectedPet');
+    };
+
+    const fetchInsurancePlans = async () => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const response = await axios.get('http://localhost:8081/policy', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        insurancePlans.value = response.data.data;
+      } catch (error) {
+        ElMessage.error('保険プランの取得に失敗しました');
+      }
+    };
+
+    const showAddPetDialog = () => {
+      addPetDialogVisible.value = true;
+    };
+
+    const addPet = async () => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) {
+          ElMessage.error('ユーザートークンが見つかりません');
+          return;
+        }
+
+        const response = await axios.post('http://localhost:8081/pets', {
+          petName: newPet.name,
+          species: newPet.species,
+          breed: newPet.breed,
+          age: newPet.age,
+          gender: newPet.gender,
+          insuranceStatus:newPet.insuranceStatus
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        pets.value.push(response.data);
+        addPetDialogVisible.value = false;
+
+        newPet.name = '';
+        newPet.species = '';
+        newPet.breed = '';
+        newPet.age = 1;
+        newPet.gender = '';
+        newPet.insuranceStatus='';
+
+        ElMessage.success('ペットの追加に成功しました');
+        fetchPets();
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const selectPlan = async (plan) => {
+  try {
+    // 从 sessionStorage 获取当前选择的宠物信息
+    const selectedPet = JSON.parse(sessionStorage.getItem('selectedPet'));
+    console.log(selectedPet);
+
+    if (!selectedPet || !selectedPet.petId) {
+      ElMessage.error('まず保険に加入しているペットを選んでください');
+      activeTab.value = 'pets';
+      return;
+    }
+
+    // 构造订单对象
+    const order = {
+      petId: selectedPet.petId,         // 宠物 ID
+      policyId: plan.policyId,       // 保険プラン ID
+      orderStatus: 'Pending',        // 初始订单状态
+    };
+console.log(order);
+    // 获取用户 token
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    console.log(token);
+    if (!token) {
+      ElMessage.error('ユーザートークンが見つかりません');
+      return;
+    }
+
+    // 调用后端接口创建订单
+    await axios.post('http://localhost:8081/orders', order, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    
+    // 提示订单创建成功
+    ElMessage.success(`${plan.policyName}を選択しました。注文が作成されました！`);
+    activeTab.value = 'pets';
+    fetchPets();
+  } catch (error) {
+    console.error('注文作成中にエラーが発生しました', error);
+    ElMessage.error('注文作成に失敗しました');
+  }
+};
+
+    const buyInsurance=(pet)=>{
+        // 获取宠物的ID
+        // const petId = pet.id;
+
+       // 将宠物信息存储到 sessionStorage（或用于其他用途）
+        sessionStorage.setItem('selectedPet', JSON.stringify(pet));
+
+        activeTab.value = 'plans';
+    }
+
+    onMounted(() => {
+      fetchPets();
+      fetchInsurancePlans();
+    });
+
+    return {
+      title,
+      activeTab,
+      pets,
+      insurancePlans,
+      addPetDialogVisible,
+      newPet,
+      showAddPetDialog,
+      addPet,
+      selectPlan,
+      buyInsurance
+    };
+  },
+};
+</script>
+
+<style>
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #f5f7fa;
+  color: #2c3e50;
+}
+
+.header {
+  background: linear-gradient(120deg, #3498db, #2980b9);
+  padding: 1.5rem 0;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.header h1 {
+  color: white;
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin: 0;
+  font-weight: 500;
+}
+
+.pet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.pet-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pet-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.pet-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.pet-avatar {
+  width: 48px;
+  height: 48px;
+  background: #e1f5fe;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.pet-name {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #2c3e50;
+}
+
+.pet-info {
+  margin-bottom: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.label {
+  color: #666;
+  width: 60px;
+}
+
+.value {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.insurance-status {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.status-tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-tag.active {
+  background: #e1f5fe;
+  color: #0288d1;
+}
+
+.status-tag.inactive {
+  background: #ffebee;
+  color: #e53935;
+}
+
+.expiry-date {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.plan-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.plan-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.plan-header h3 {
+  margin: 0 0 1rem;
+  color: #2c3e50;
+}
+
+.premium {
+  font-size: 1.5rem;
+  color: #e53935;
+  font-weight: 600;
+}
+
+.premium span {
+  font-size: 1rem;
+  color: #666;
+  font-weight: normal;
+}
+
+.plan-content {
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
+}
+
+.description {
+  margin: 0 0 1rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+.coverage {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.coverage-label {
+  display: block;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.coverage-amount {
+  font-size: 1.25rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+  </style>
+  
