@@ -1,12 +1,17 @@
 package com.animalSecurity.controller;
 import com.animalSecurity.config.CustomUserDetails;
 import com.animalSecurity.entity.Orders;
+import com.animalSecurity.entity.Policy;
 import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IOrdersService;
+import com.animalSecurity.service.IPetsService;
+import com.animalSecurity.service.IPolicyService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
+
 
 
 /**
@@ -23,6 +28,12 @@ public class OrdersController {
 
     @Autowired
     private IOrdersService orderService;
+
+    @Autowired
+    private IPolicyService policyService;
+
+    @Autowired
+    private IPetsService petsService;
 
     // 用户：查询当前用户的所有订单
     @GetMapping
@@ -62,9 +73,32 @@ public class OrdersController {
 
         order.setOrderStatus("Pending");
         order.setUserId(userId); // 设置 userId
+
+        Policy policy = policyService.getById(order.getPolicyId());
+
+        order.setTotalPrice(policy.getPremium());
+
+        order.setStartDate(LocalDate.now());
+
+        int termsMonth=policy.getTermMonths();
+
+        LocalDate endDate = LocalDate.now().plusMonths(termsMonth);
+
+        order.setEndDate(endDate);
+
         boolean success = orderService.createOrder(order);
         if (success) {
-            return Result.success("Order created successfully!");
+
+            // 更新宠物的参保状态
+            boolean petUpdateSuccess = petsService.updateInsuranceStatus(order.getPetId(), "active");
+
+            if (petUpdateSuccess) {
+                return Result.success("Order created and pet insurance status updated successfully!");
+            } else {
+                // 如果更新宠物参保状态失败，返回订单创建成功，但参保状态更新失败的消息
+                return Result.success("Order created successfully, but failed to update pet insurance status.");
+            }
+
         }
         return Result.fail(500, "Failed to create order.");
     }

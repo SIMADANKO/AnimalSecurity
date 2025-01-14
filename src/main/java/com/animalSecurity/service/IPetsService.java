@@ -23,4 +23,6 @@ public interface IPetsService extends IService<Pets> {
     boolean updatePet(Pets pet);           // 更新宠物信息
 
     boolean deletePet(int id);            // 删除宠物
+
+    boolean updateInsuranceStatus(Integer petId, String status);
 }

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     @Autowired
     private OrdersMapper orderMapper;
 
+
     public Page<Orders> getAllOrdersByUserId(Integer userId, int page, int size) {
         // 创建 Page 对象，page 表示当前页，size 表示每页大小
         Page<Orders> pageParam = new Page<>(page, size);
@@ -33,6 +35,15 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         return orderMapper.selectPage(pageParam,
                 new QueryWrapper<Orders>().eq("user_id", userId));
     }
+
+
+
+    @Override
+    public boolean checkInsuranceExpiry(LocalDate endDate) {
+        // 判断当前日期是否大于保险的结束日期
+        return LocalDate.now().isAfter(endDate);
+    }
+
 
     @Override
     public Orders getOrderById(Integer orderId) {

@@ -43,7 +43,17 @@ public class Pets implements Serializable {
     @ApiModelProperty("宠物性别")
     private String gender;
 
+    @ApiModelProperty("宠物参保状况")
+    private String insuranceStatus;
 
+
+    public String getInsuranceStatus() {
+        return insuranceStatus;
+    }
+
+    public void setInsuranceStatus(String insuranceStatus) {
+        this.insuranceStatus = insuranceStatus;
+    }
 
     public Integer getPetId() {
         return petId;
@@ -105,14 +115,14 @@ public class Pets implements Serializable {
     @Override
     public String toString() {
         return "Pets{" +
-            "petId = " + petId +
-            ", userId = " + userId +
-            ", petName = " + petName +
-            ", species = " + species +
-            ", breed = " + breed +
-            ", age = " + age +
-            ", gender = " + gender +
-
-        "}";
+                "petId=" + petId +
+                ", userId=" + userId +
+                ", petName='" + petName + '\'' +
+                ", species='" + species + '\'' +
+                ", breed='" + breed + '\'' +
+                ", age=" + age +
+                ", gender='" + gender + '\'' +
+                ", insuranceStatus='" + insuranceStatus + '\'' +
+                '}';
     }
 }

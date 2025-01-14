@@ -4,6 +4,7 @@ import com.animalSecurity.entity.Orders;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -20,5 +21,6 @@ public interface IOrdersService extends IService<Orders> {
     boolean createOrder(Orders order);                         // 创建订单
     boolean updateOrderStatus(Integer orderId, String status,Integer vendorId); // 更新订单状态
     Page<Orders> getAllOrdersByUserId(Integer userId, int page, int size);    //分页查询所有订单
+    boolean checkInsuranceExpiry(LocalDate endDate);
 
 }

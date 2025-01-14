@@ -20,7 +20,8 @@ import java.util.List;
  * @since 2024-12-07
  */
 @Service
-public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IPetsService {
+public
+class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IPetsService {
     @Autowired
     private PetsMapper petMapper;
 
@@ -51,4 +52,17 @@ public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IP
     public boolean deletePet(int id) {
         return petMapper.deleteById(id) > 0; // 删除成功返回 true
     }
+
+    public boolean updateInsuranceStatus(Integer petId, String status) {
+        // 查找宠物并更新其参保状态
+        Pets pet = petMapper.selectById(petId);
+        if (pet != null) {
+            pet.setInsuranceStatus(status);  // 设置保险状态
+            int rowsAffected = petMapper.updateById(pet);
+            return rowsAffected > 0;
+        }
+        return false;
+    }
+
+
 }
