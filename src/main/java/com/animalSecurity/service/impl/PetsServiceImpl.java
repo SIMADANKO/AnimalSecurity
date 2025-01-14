@@ -25,7 +25,7 @@ public class PetsServiceImpl extends ServiceImpl<PetsMapper, Pets> implements IP
     private PetsMapper petMapper;
 
     //查询当前用户所有宠物
-    public Page<Pets> getPetsByUserId(String userId, Page<Pets> page) {
+    public Page<Pets> getPetsByUserId(Integer userId, Page<Pets> page) {
         // 创建查询条件
         QueryWrapper<Pets> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", userId);  // 根据 userId 查询

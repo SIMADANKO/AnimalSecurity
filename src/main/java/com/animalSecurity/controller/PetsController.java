@@ -1,5 +1,6 @@
 package com.animalSecurity.controller;
 
+import com.animalSecurity.config.CustomUserDetails;
 import com.animalSecurity.entity.Pets;
 import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IPetsService;
@@ -32,8 +33,13 @@ public class PetsController {
             @RequestParam Integer size,
             Authentication authentication) {
 
+        // 获取 CustomUserDetails
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
         // 从 Token (Authentication) 中获取当前用户的 ID
-        String userId = authentication.getName();
+        Integer userId = userDetails.getUserId();
+
+        System.out.println(authentication);
 
         // 创建分页对象
         Page<Pets> pageParam = new Page<>(page, size);
@@ -50,7 +56,17 @@ public class PetsController {
 
     // 添加新宠物
     @PostMapping
-    public Result<String> addPet(@RequestBody Pets pet) {
+    public Result<String> addPet(@RequestBody Pets pet, Authentication authentication) {
+        // 获取 CustomUserDetails
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // 从 Token (Authentication) 中获取当前用户的 ID
+        Integer userId = userDetails.getUserId();
+
+        // 将 userId 设置到 pet 对象中
+        pet.setUserId(userId);
+
+        // 调用 service 层方法添加宠物
         boolean success = petService.addPet(pet);
         if (success) {
             return Result.success("Pet added successfully!");

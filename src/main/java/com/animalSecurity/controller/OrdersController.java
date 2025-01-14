@@ -1,4 +1,5 @@
 package com.animalSecurity.controller;
+import com.animalSecurity.config.CustomUserDetails;
 import com.animalSecurity.entity.Orders;
 import com.animalSecurity.lang.Result;
 import com.animalSecurity.service.IOrdersService;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/orders")
 public class OrdersController {
+
     @Autowired
     private IOrdersService orderService;
 
@@ -29,8 +31,8 @@ public class OrdersController {
             @RequestParam Integer size,
             Authentication authentication) {
 
-        // 从 Authentication 获取当前用户的 ID
-        Integer userId = Integer.parseInt(authentication.getName());
+        // 从 Authentication 获取当前用户的 userId
+        Integer userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
 
         // 调用服务层方法进行分页查询
         Page<Orders> ordersPage = orderService.getAllOrdersByUserId(userId, page, size);
@@ -44,7 +46,8 @@ public class OrdersController {
     // 用户：查看订单详情
     @GetMapping("/{id}")
     public Result<Orders> getOrderById(@PathVariable Integer id) {
-        Orders order = orderService.getOrderById(id);
+
+        Orders order = orderService.getOrderById(id); // 使用 userId 查询
         if (order != null) {
             return Result.success(order);
         }
@@ -54,10 +57,11 @@ public class OrdersController {
     // 用户：创建新订单
     @PostMapping
     public Result<String> createOrder(@RequestBody Orders order, Authentication authentication) {
-        // 从 Authentication 获取当前用户的 ID
-        Integer userId = Integer.parseInt(authentication.getName());
+        // 从 Authentication 获取当前用户的 userId
+        Integer userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+
         order.setOrderStatus("Pending");
-        order.setUserId(userId); // 设置用户 ID
+        order.setUserId(userId); // 设置 userId
         boolean success = orderService.createOrder(order);
         if (success) {
             return Result.success("Order created successfully!");
@@ -70,8 +74,10 @@ public class OrdersController {
     public Result<String> updateOrderStatus(@PathVariable Integer id,
                                             @RequestParam String status,
                                             Authentication authentication) {
-        Integer vendorId = Integer.parseInt(authentication.getName());
-        boolean success = orderService.updateOrderStatus(id, status, vendorId);
+        // 管理员身份使用 userId
+        Integer userId = ((CustomUserDetails) authentication.getPrincipal()).getUserId();
+
+        boolean success = orderService.updateOrderStatus(id, status, userId); // 使用 userId 更新订单
         if (success) {
             return Result.success("Order status updated successfully!");
         }

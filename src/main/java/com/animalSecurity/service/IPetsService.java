@@ -16,7 +16,7 @@ import java.util.List;
  */
 public interface IPetsService extends IService<Pets> {
 
-    Page<Pets> getPetsByUserId(String userId, Page<Pets> page);// 查询所有宠物
+    Page<Pets> getPetsByUserId(Integer userId, Page<Pets> page);// 查询所有宠物
 
     boolean addPet(Pets pet);              // 添加宠物
 

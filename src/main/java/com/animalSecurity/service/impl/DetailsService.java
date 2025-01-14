@@ -1,5 +1,6 @@
 package com.animalSecurity.service.impl;
 
+import com.animalSecurity.config.CustomUserDetails;
 import com.animalSecurity.entity.Users;
 import com.animalSecurity.entity.Vendors;
 import com.animalSecurity.mapper.UsersMapper;
@@ -36,13 +37,15 @@ public class DetailsService implements UserDetailsService {
             }
 
             // 将 Users 对象转为 Spring Security 的 User 对象
-            return new User(
+            return new CustomUserDetails(
+                    user.getUserId(),
                     user.getUsername(),
                     user.getPassword(),
                     AuthorityUtils.createAuthorityList("ROLE_USER")
             );
         }else{
-            return new User(
+            return new CustomUserDetails(
+                    vendors.getVendorId(),
                     vendors.getVendorName(),
                     vendors.getPassword(),
                     AuthorityUtils.createAuthorityList("ROLE_ADMIN")
