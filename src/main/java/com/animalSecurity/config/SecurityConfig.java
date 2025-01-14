@@ -23,11 +23,16 @@ public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Autowired
-    private DetailsService userDetailsService;
+    private DetailsService customUserDetailsService;
+
+    @Autowired
+    private CorsConfig corsConfig; // 引入 CORS 配置
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors().configurationSource(corsConfig.corsConfigurationSource()) // 添加 CORS 配置
+                .and()
                 .csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
@@ -46,14 +51,14 @@ public class SecurityConfig {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
 
-        authenticationManagerBuilder.userDetailsService(userDetailsService)
+        authenticationManagerBuilder.userDetailsService(customUserDetailsService)
         .passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();  // 明文密码
+        return new BCryptPasswordEncoder();  // 加密密码
     }
 
 }

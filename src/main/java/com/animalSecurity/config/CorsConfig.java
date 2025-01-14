@@ -1,6 +1,10 @@
 package com.animalSecurity.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -20,5 +24,23 @@ public class CorsConfig implements WebMvcConfigurer {
                 .allowedHeaders("*") // 允许所有请求头
          .exposedHeaders("Authorization");
 
+    }
+
+    // 如果需要，暴露配置源给 Spring Security 使用
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("http://localhost:8080");  // 前端地址
+        configuration.addAllowedMethod("*");  // 所有请求方法
+        configuration.addAllowedHeader("*");  // 所有请求头
+        configuration.setAllowCredentials(true);  // 允许发送 cookies
+
+        // 显式允许 Authorization 头部暴露
+        configuration.addExposedHeader("Authorization");
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }
