@@ -1,17 +1,17 @@
 create database animalsec;
 use animalsec;
 
-CREATE TABLE `vendors` (
-  `vendor_id` int NOT NULL AUTO_INCREMENT COMMENT '商家ID',
+DROP TABLE IF EXISTS `vendors`;
+CREATE TABLE `vendors` ( 
+ `vendor_id` int NOT NULL AUTO_INCREMENT COMMENT '商家ID',
   `vendor_name` varchar(100) NOT NULL COMMENT '商家名称',
   `contact_email` varchar(100) NOT NULL COMMENT '联系邮箱',
-  `contact_phone` varchar(20) DEFAULT NULL COMMENT '联系电话',
-  `address` varchar(255) DEFAULT NULL COMMENT '商家地址',
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
-  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',
+  `password` varchar(255) NOT NULL,
   PRIMARY KEY (`vendor_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='商家表';
 
+
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `user_id` int NOT NULL AUTO_INCREMENT COMMENT '用户ID',
   `username` varchar(50) NOT NULL COMMENT '用户名',
@@ -22,6 +22,7 @@ CREATE TABLE `users` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户表';
 
+DROP TABLE IF EXISTS `policy`;
 CREATE TABLE `policy` (
   `policy_id` int NOT NULL AUTO_INCREMENT COMMENT '保险产品ID',
   `policy_name` varchar(100) NOT NULL COMMENT '保险产品名称',
@@ -32,6 +33,7 @@ CREATE TABLE `policy` (
   PRIMARY KEY (`policy_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='保险产品表';
 
+DROP TABLE IF EXISTS `pets`;
 CREATE TABLE `pets` (
   `pet_id` int NOT NULL AUTO_INCREMENT COMMENT '宠物ID',
   `user_id` int NOT NULL COMMENT '用户ID，外键关联用户表',
@@ -40,11 +42,13 @@ CREATE TABLE `pets` (
   `breed` varchar(50) DEFAULT NULL COMMENT '宠物品种',
   `age` int DEFAULT NULL COMMENT '宠物年龄',
   `gender` enum('Male','Female') DEFAULT NULL COMMENT '宠物性别',
+  `insurance_status` enum('active','inactive') DEFAULT 'inactive',
   PRIMARY KEY (`pet_id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `pets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='宠物表';
+  CONSTRAINT `pets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`userId`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='宠物表';
 
+DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `order_id` int NOT NULL AUTO_INCREMENT COMMENT '订单ID',
   `pet_id` int NOT NULL COMMENT '宠物ID，外键关联宠物表',
