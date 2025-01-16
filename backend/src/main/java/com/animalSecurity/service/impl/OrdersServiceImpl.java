@@ -1,7 +1,12 @@
 package com.animalSecurity.service.impl;
 
+import com.animalSecurity.dto.OrderDetailDTO;
 import com.animalSecurity.entity.Orders;
+import com.animalSecurity.entity.Pets;
+import com.animalSecurity.entity.Policy;
 import com.animalSecurity.mapper.OrdersMapper;
+import com.animalSecurity.mapper.PetsMapper;
+import com.animalSecurity.mapper.PolicyMapper;
 import com.animalSecurity.service.IOrdersService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -25,6 +30,10 @@ import java.util.List;
 public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> implements IOrdersService {
     @Autowired
     private OrdersMapper orderMapper;
+    @Autowired
+    private PolicyMapper policyMapper;
+    @Autowired
+    private PetsMapper petsMapper;
 
 
     public Page<Orders> getAllOrdersByUserId(Integer userId, int page, int size) {
@@ -69,5 +78,37 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         return false;
     }
 
+    public OrderDetailDTO getOrderDetailByPolicyId(int orderId) {
+        Orders order = orderMapper.selectById(orderId);
+
+        // 先查询保险表中的保险产品信息
+        Policy policy = policyMapper.selectById(order.getPolicyId());
+        if (policy == null) {
+            return null;
+        }
+
+        // 查询宠物表，假设保险产品和宠物表通过 policyId 进行关联
+        Pets pet = petsMapper.selectById(order.getPetId());
+        if (pet == null) {
+            return null;
+        }
+
+        // 将数据封装成 OrderDetailDTO 对象
+        OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
+        orderDetailDTO.setPetName(pet.getPetName());
+        orderDetailDTO.setPolicyName(policy.getPolicyName());
+        orderDetailDTO.setPrice(policy.getPremium());
+        orderDetailDTO.setOrderId(orderId);
+        orderDetailDTO.setOrderStatus(order.getOrderStatus());
+        orderDetailDTO.setPetId(pet.getPetId());
+        orderDetailDTO.setPolicyId(policy.getPolicyId());
+        orderDetailDTO.setStartDate(order.getStartDate());
+
+        orderDetailDTO.setUpdateTime(order.getUpdateTime());
+        orderDetailDTO.setUserId(order.getUserId());
+        orderDetailDTO.setVendorId(order.getVendorId());
+
+        return orderDetailDTO;
+    }
 
 }

@@ -63,6 +63,8 @@ public class PetsController {
         // 从 Token (Authentication) 中获取当前用户的 ID
         Integer userId = userDetails.getUserId();
 
+        pet.setInsuranceStatus("inactive");
+
         // 将 userId 设置到 pet 对象中
         pet.setUserId(userId);
 

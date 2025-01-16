@@ -1,5 +1,6 @@
 package com.animalSecurity.service;
 
+import com.animalSecurity.dto.OrderDetailDTO;
 import com.animalSecurity.entity.Orders;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -22,5 +23,6 @@ public interface IOrdersService extends IService<Orders> {
     boolean updateOrderStatus(Integer orderId, String status,Integer vendorId); // 更新订单状态
     Page<Orders> getAllOrdersByUserId(Integer userId, int page, int size);    //分页查询所有订单
     boolean checkInsuranceExpiry(LocalDate endDate);
+    OrderDetailDTO getOrderDetailByPolicyId(int orderId);
 
 }

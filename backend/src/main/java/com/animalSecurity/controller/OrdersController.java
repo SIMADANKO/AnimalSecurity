@@ -1,5 +1,6 @@
 package com.animalSecurity.controller;
 import com.animalSecurity.config.CustomUserDetails;
+import com.animalSecurity.dto.OrderDetailDTO;
 import com.animalSecurity.entity.Orders;
 import com.animalSecurity.entity.Policy;
 import com.animalSecurity.lang.Result;
@@ -56,9 +57,9 @@ public class OrdersController {
 
     // 用户：查看订单详情
     @GetMapping("/{id}")
-    public Result<Orders> getOrderById(@PathVariable Integer id) {
+    public Result<OrderDetailDTO> getOrderById(@PathVariable Integer id) {
 
-        Orders order = orderService.getOrderById(id); // 使用 userId 查询
+        OrderDetailDTO order = orderService.getOrderDetailByPolicyId(id); // 使用 orderId 查询
         if (order != null) {
             return Result.success(order);
         }
