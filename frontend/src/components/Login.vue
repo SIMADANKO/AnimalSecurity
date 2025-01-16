@@ -308,22 +308,30 @@ export default {
   });
 };
 
-    const handleRegister = () => {
-      registerFormRef.value.validate(async (valid) => {
-        if (valid) {
-          loading.value = true;
-          try {
-            await axios.post('http://localhost:8081/users/register', registerForm);
-            ElMessage.success('注册成功');
-            activeTab.value = 'login';
-          } catch (error) {
-            ElMessage.error(error.response?.data?.message || '注册失败，请稍后重试');
-          } finally {
-            loading.value = false;
-          }
+const handleRegister = () => {
+  registerFormRef.value.validate(async (valid) => {
+    if (valid) {
+      loading.value = true;
+      try {
+        const response = await axios.post('http://localhost:8081/users/register', {
+          username: registerForm.username,
+          password: registerForm.password,
+          email: registerForm.email,
+        });
+        if (response.data?.code === 200) {
+          ElMessage.success('注册成功');
+          activeTab.value = 'login'; // 切换到登录界面
+        } else {
+          ElMessage.error( '该用户名已存在');
         }
-      });
-    };
+      } catch (error) {
+        ElMessage.error('注册邮箱已存在');
+      } finally {
+        loading.value = false;
+      }
+    }
+  });
+};
 
     const handleForgotPassword = () => {
       forgotPasswordFormRef.value.validate(async (valid) => {
