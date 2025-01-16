@@ -137,7 +137,7 @@
             <div v-for="plan in insurancePlans" :key="plan.policyId" class="plan-card">
               <div class="plan-header">
                 <h3>{{ plan.policyName }}</h3>
-                <div class="premium">¥{{ plan.premium }}<span>/年</span></div>
+                <div class="premium">¥{{ plan.premium }}</div>
               </div>
               
               <div class="plan-content">
@@ -145,6 +145,7 @@
                 <div class="coverage">
                   <span class="coverage-label">保障範囲</span>
                   <span class="coverage-amount">¥{{ plan.coverage }}</span>
+                  <span class="coverage-amount">/{{ plan.termMonths }}ヶ月</span>
                 </div>
               </div>
 
@@ -495,6 +496,7 @@ export default {
           }
         });
         insurancePlans.value = response.data.data;
+        console.log(insurancePlans.value);
       } catch (error) {
         // ElMessage.error('保険プランの取得に失敗しました');
       }
