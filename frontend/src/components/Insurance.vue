@@ -58,6 +58,20 @@
     保険を購入する
   </el-button>
 
+  <el-button 
+                  type="warning" 
+                  class="action-btn"
+                  @click="showEditPetDialog(pet)">
+                  編集
+                </el-button>
+                
+                <el-button 
+                  type="danger" 
+                  class="action-btn"
+                  @click="confirmDeletePet(pet)">
+                  削除
+                </el-button>
+
   <!-- 如果保险状态是active，则显示更新保险按钮 -->
   <!-- <el-button 
     type="success" 
@@ -66,7 +80,50 @@
     v-else>
     保険を更新する
   </el-button> -->
+
+  
 </div>
+            </div>
+          </div>
+          
+        </el-tab-pane>
+        <el-tab-pane label="注文履歴" name="orders">
+          <div class="page-header">
+            <h2 class="section-title">注文履歴</h2>
+          </div>
+          
+          <div class="orders-table">
+            <el-table :data="orders" style="width: 100%" align="center" >
+              <el-table-column prop="orderId" label="注文番号" width="120" />
+              <el-table-column prop="petId" label="ペットID" width="120" />
+              <el-table-column prop="policyId" label="保険プランID " width="200" />
+              <el-table-column prop="orderStatus" label="状態" width="120">
+                <template #default="scope" >
+                  <el-tag :type="getOrderStatusType(scope.row.orderStatus)" >
+                    {{ getOrderStatusText(scope.row.orderStatus) }}
+                  </el-tag>
+                </template>
+              </el-table-column>
+              <el-table-column prop="createTime" label="注文日" width="180" />
+              <el-table-column label="操作" width="120">
+                <template #default="scope">
+                  <el-button
+                    size="small"
+                    @click="showOrderDetails(scope.row)">
+                    詳細
+                  </el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            
+            <div class="pagination">
+              <el-pagination
+                @current-change="handleOrderPageChange"
+                :current-page="orderPage"
+                :page-size="orderPageSize"
+                :total="orderTotal"
+                layout="prev, pager, next"
+              />
             </div>
           </div>
         </el-tab-pane>
@@ -101,7 +158,79 @@
           </div>
         </el-tab-pane>
       </el-tabs>
+      <el-dialog 
+        v-model="editPetDialogVisible" 
+        title="ペット情報を編集する" 
+        width="500px"
+      >
+        <el-form :model="editingPet" label-width="100px" class="pet-form">
+          <el-form-item label="名前">
+            <el-input v-model="editingPet.petName" placeholder="ペット名を入力してください"></el-input>
+          </el-form-item>
+          <el-form-item label="品種">
+            <el-input v-model="editingPet.breed" placeholder="品種を入力してください"></el-input>
+          </el-form-item>
+          <el-form-item label="種類">
+            <el-input v-model="editingPet.species" placeholder="種類を入力してください"></el-input>
+          </el-form-item>
+          <el-form-item label="年齢">
+            <el-input-number 
+              v-model="editingPet.age" 
+              :min="0" 
+              :max="20"
+              controls-position="right">
+            </el-input-number>
+          </el-form-item>
+          <el-form-item label="性別">
+            <el-select v-model="editingPet.gender" placeholder="性別を選択してください">
+              <el-option label="雄性" value="Male"></el-option>
+              <el-option label="雌性" value="Female"></el-option>
+            </el-select>
+          </el-form-item>
+        </el-form>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="editPetDialogVisible = false">キャンセル</el-button>
+            <el-button type="primary" @click="updatePet">保存</el-button>
+          </span>
+        </template>
+      </el-dialog>
 
+      <!-- Order Details Dialog -->
+      <el-dialog
+        v-model="orderDetailsDialogVisible"
+        title="注文詳細"
+        width="600px"
+      >
+        <div v-if="selectedOrder" class="order-details">
+          <div class="detail-item">
+            <span class="detail-label">注文番号：</span>
+            <span class="detail-value">{{ selectedOrder.orderId }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">ペット名：</span>
+            <span class="detail-value">{{ selectedOrder.petName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">保険プラン：</span>
+            <span class="detail-value">{{ selectedOrder.policyName }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">状態：</span>
+            <el-tag :type="getOrderStatusType(selectedOrder.orderStatus)">
+              {{ getOrderStatusText(selectedOrder.orderStatus) }}
+            </el-tag>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">注文日：</span>
+            <span class="detail-value">{{ selectedOrder.startDate }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">金額：</span>
+            <span class="detail-value">¥{{ selectedOrder.price }}</span>
+          </div>
+        </div>
+      </el-dialog>
       <!-- 添加宠物对话框 -->
       <el-dialog 
         v-model="addPetDialogVisible" 
@@ -149,17 +278,30 @@
 // Script部分保持不变
 import axios from 'axios';
 import { ref, reactive, onMounted,watch} from 'vue';
-import { ElMessage } from 'element-plus';
+import {  ElMessage, ElMessageBox, ElTable, ElTableColumn, ElDialog, ElInput, ElButton, ElSelect } from 'element-plus';
+
 
 export default {
+  components: {
+    ElTable,
+    ElTableColumn,
+    ElDialog,
+    ElInput,
+    ElButton,
+    ElSelect
+  },
   name: 'PetInsuranceSystem',
   setup() {
     const title = ref('ペット保険システム');
     const activeTab = ref('pets');
     const addPetDialogVisible = ref(false);
-
     const pets = ref([]);
     const insurancePlans = ref([]);
+    const editPetDialogVisible = ref(false);
+    const orderDetailsDialogVisible = ref(false);
+    const editingPet = ref({});
+    const selectedOrder = ref(null);
+    
 
     const newPet = reactive({
       name: '',
@@ -169,6 +311,152 @@ export default {
       gender: '',
       insuranceStatus:''
     });
+
+   
+   
+
+    // Orders pagination
+    const orders = ref([]);
+    const orderPage = ref(1);
+    const orderPageSize = ref(10);
+    const orderTotal = ref(0);
+
+    // Fetch orders
+    const fetchOrders = async () => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const response = await axios.get(`http://localhost:8081/orders`, {
+          params: {
+            page: orderPage.value,
+            size: orderPageSize.value
+          },
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        orders.value = response.data.data.records;
+        console.log(orders.value);
+        orderTotal.value = response.data.data.total;
+      } catch (error) {
+        // ElMessage.error('注文履歴の取得に失敗しました');
+      }
+    };
+
+    // Handle order page change
+    const handleOrderPageChange = (page) => {
+      orderPage.value = page;
+      fetchOrders();
+    };
+
+    // Show order details
+    const showOrderDetails = async (order) => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const response = await axios.get(`http://localhost:8081/orders/${order.orderId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        selectedOrder.value = response.data.data;
+        console.log(selectedOrder.value);
+        orderDetailsDialogVisible.value = true;
+      } catch (error) {
+        // ElMessage.error('注文詳細の取得に失敗しました');
+      }
+    };
+
+    // Show edit pet dialog
+    const showEditPetDialog = (pet) => {
+      editingPet.value = { ...pet };
+      editPetDialogVisible.value = true;
+    };
+
+    // Update pet
+    const updatePet = async () => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        await axios.put('http://localhost:8081/pets', editingPet.value, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        ElMessage.success('ペット情報の更新に成功しました');
+        editPetDialogVisible.value = false;
+        fetchPets();
+      } catch (error) {
+        ElMessage.error('ペット情報の更新に失敗しました');
+      }
+    };
+
+    // Confirm and delete pet
+    const confirmDeletePet = (pet) => {
+      ElMessageBox.confirm(
+        'このペットを削除してもよろしいですか？',
+        '確認',
+        {
+          confirmButtonText: '削除',
+          cancelButtonText: 'キャンセル',
+          type: 'warning',
+        }
+      )
+        .then(() => {
+          deletePet(pet.petId);
+        })
+        .catch(() => {
+          // User canceled
+        });
+    };
+
+    // Delete pet
+    const deletePet = async (petId) => {
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        await axios.delete(`http://localhost:8081/pets/${petId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        ElMessage.success('ペットの削除に成功しました');
+        fetchPets();
+      } catch (error) {
+        ElMessage.error('ペットの削除に失敗しました');
+      }
+    };
+
+    // Order status helpers
+    const getOrderStatusType = (status) => {
+      const statusMap = {
+        'Pending': 'warning',
+        'Completed': 'success',
+        'Cancelled': 'danger'
+      };
+      return statusMap[status] || 'info';
+    };
+
+    const getOrderStatusText = (status) => {
+      const statusMap = {
+        'Pending': '処理中',
+        'Completed': '完了',
+        'Cancelled': 'キャンセル'
+      };
+      return statusMap[status] || status;
+    };
+
+    // Watch for tab changes
+    watch(activeTab, (newTab) => {
+      if (newTab === 'pets') {
+        fetchPets();
+      } else if (newTab === 'orders') {
+        fetchOrders();
+      }
+    });
+
+    onMounted(() => {
+      fetchPets();
+      fetchInsurancePlans();
+      fetchOrders();
+    });
+
 
     watch(activeTab, (newTab) => {
       if (newTab === 'pets') {
@@ -191,7 +479,7 @@ export default {
         pets.value = response.data.data.records;
         console.log(pets.value);
       } catch (error) {
-        ElMessage.error('ペットデータの取得に失敗しました');
+        // ElMessage.error('ペットデータの取得に失敗しました');
         console.log(error);
       }
 
@@ -208,7 +496,7 @@ export default {
         });
         insurancePlans.value = response.data.data;
       } catch (error) {
-        ElMessage.error('保険プランの取得に失敗しました');
+        // ElMessage.error('保険プランの取得に失敗しました');
       }
     };
 
@@ -220,7 +508,7 @@ export default {
       try {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) {
-          ElMessage.error('ユーザートークンが見つかりません');
+          // ElMessage.error('ユーザートークンが見つかりません');
           return;
         }
 
@@ -277,7 +565,7 @@ console.log(order);
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     console.log(token);
     if (!token) {
-      ElMessage.error('ユーザートークンが見つかりません');
+      // ElMessage.error('ユーザートークンが見つかりません');
       return;
     }
 
@@ -323,7 +611,22 @@ console.log(order);
       showAddPetDialog,
       addPet,
       selectPlan,
-      buyInsurance
+      buyInsurance,
+      orders,
+      orderPage,
+      orderPageSize,
+      orderTotal,
+      editPetDialogVisible,
+      orderDetailsDialogVisible,
+      editingPet,
+      selectedOrder,
+      showEditPetDialog,
+      updatePet,
+      confirmDeletePet,
+      handleOrderPageChange,
+      showOrderDetails,
+      getOrderStatusType,
+      getOrderStatusText
     };
   },
 };
@@ -535,6 +838,39 @@ body {
   font-size: 1.25rem;
   color: #2c3e50;
   font-weight: 500;
+}
+
+.orders-table {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.1);
+}
+
+.pagination {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.order-details {
+  padding: 1rem;
+}
+
+.detail-item {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.detail-label {
+  width: 120px;
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #2c3e50;
 }
   </style>
   
