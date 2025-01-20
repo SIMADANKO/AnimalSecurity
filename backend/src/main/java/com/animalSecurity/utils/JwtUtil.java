@@ -14,7 +14,7 @@ import javax.crypto.KeyGenerator;
 @Component
 public class JwtUtil {
     private static final String SECRET_KEY = "eyJhbGciOiJIUzI1NiJ9eyJzdWIiOiJTaXp1a2EiLCJpYXQiOjE3MzY0NDQyOTQsImV4cCI6MTczNjQ0Nzg5NH0iLcq72DA40nJccBJliifWlYnsfxwrTK5niCldEbbObs";  // 使用 Base64 编码的密钥
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24 hour
 
     // 生成随机密钥
     private static SecretKey generateSecretKey() throws Exception {
