@@ -34,6 +34,22 @@ export default {
       router.push('/'); // 返回登录页面
     };
 
+    window.ResizeObserver = class ResizeObserver extends window.ResizeObserver {
+  constructor(callback) {
+    let timer = null;
+    const debouncedCallback = function () {
+      let context = this;
+      let args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        callback.apply(context, args);
+      }, 16);
+    };
+    super(debouncedCallback);
+  }
+};
+
+
     return {
       showNav,
       logout,
