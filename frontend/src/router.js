@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Insurance from './components/Insurance.vue'; 
 import Login from './components/Login.vue'; 
+import AdminDashboard from './components/AdminDashboard.vue';
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     name: 'Insurance',
     component: Insurance,
   },
+  {
+    path: '/admin',
+    name:'AdminDashboard',
+    component: AdminDashboard
+  }
 ];
 
 const router = createRouter({

@@ -267,23 +267,27 @@ export default {
           // 判断后端返回的状态码是否为 200
           if (response.data.code === 200) {
             const jwt = response.headers['authorization']; // 获取 Authorization header
+            const roles = response.data.data.roles; // 获取后端返回的用户角色信息
             console.log(jwt);
             console.log(response.data);
             console.log(response.headers);
-            
+            console.log(response.data.data.roles);
 
             // 根据 rememberMe 判断保存 token 的位置
             if (rememberMe.value) {
-              localStorage.setItem('token', jwt);  // 如果选择记住我，将 token 存储到 localStorage
+              localStorage.setItem('token', jwt); // 如果选择记住我，将 token 存储到 localStorage
             } else {
               sessionStorage.setItem('token', jwt); // 否则存储到 sessionStorage
             }
-
             
-           
+            // 判断用户角色并跳转到对应页面
+            if (roles.includes('ROLE_ADMIN')) {
+              router.push({ name: 'AdminDashboard' }); // 如果是管理员角色，跳转到 Order 页面
+            } else {
+              router.push({ name: 'Insurance' }); // 如果是普通用户，跳转到 Insurance 页面
+            }
 
             ElMessage.success('登录成功');
-            router.push({ name: 'Insurance' }); // 登录成功后跳转到 Insurance 页面
           } else {
             // 后端返回状态码不为 200，处理登录失败的情况
             const errorMessage = response.data.msg;
@@ -299,6 +303,7 @@ export default {
           } else {
             // 其他错误处理
             ElMessage.error('登录失败，请检查用户名或密码');
+            console.log(error);
           }
         })
         .finally(() => {
