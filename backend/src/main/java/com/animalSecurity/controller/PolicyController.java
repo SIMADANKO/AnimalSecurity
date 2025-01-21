@@ -45,7 +45,7 @@ public class PolicyController {
     }
 
     // 管理员：添加保险产品
-//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public Result<String> addPolicy(@RequestBody Policy policy) {
         boolean success = policyService.addPolicy(policy);
