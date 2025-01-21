@@ -13,11 +13,13 @@ public class OrderDetailDTO {
     private int petId;
     private int policyId;
     private LocalDate startDate;
+    private LocalDate endDate;
     private BigDecimal totalPrice;
-    private
-    LocalDateTime updateTime;
+    private LocalDate updateTime;
     private int userId;
     private Integer vendorId;
+    private String description;
+    private BigDecimal coverage;
 
     // Getter and Setter methods
 
@@ -95,11 +97,11 @@ public class OrderDetailDTO {
         this.totalPrice = totalPrice;
     }
 
-    public LocalDateTime getUpdateTime() {
+    public LocalDate getUpdateTime() {
         return updateTime;
     }
 
-    public void setUpdateTime(LocalDateTime updateTime) {
+    public void setUpdate(LocalDate updateTime) {
         this.updateTime = updateTime;
     }
 
@@ -117,5 +119,33 @@ public class OrderDetailDTO {
 
     public void setVendorId(Integer vendorId) {
         this.vendorId = vendorId;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public void setUpdateTime(LocalDate updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public BigDecimal getCoverage() {
+        return coverage;
+    }
+
+    public void setCoverage(BigDecimal coverage) {
+        this.coverage = coverage;
     }
 }

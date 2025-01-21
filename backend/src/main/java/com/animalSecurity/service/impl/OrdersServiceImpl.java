@@ -61,8 +61,8 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
 
     @Override
     public boolean createOrder(Orders order) {
-        order.setCreateTime(LocalDateTime.now());
-        order.setUpdateTime(LocalDateTime.now());
+        order.setCreateTime(LocalDate.now());
+        order.setUpdateTime(LocalDate.now());
         return orderMapper.insert(order) > 0; // 插入订单数据
     }
 
@@ -72,7 +72,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         if (order != null) {
             order.setOrderStatus(status);
             order.setVendorId(vendorId); // 添加管理员 ID
-            order.setUpdateTime(LocalDateTime.now());
+            order.setUpdateTime(LocalDate.now());
             return orderMapper.updateById(order) > 0;
         }
         return false;
@@ -103,12 +103,22 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         orderDetailDTO.setPetId(pet.getPetId());
         orderDetailDTO.setPolicyId(policy.getPolicyId());
         orderDetailDTO.setStartDate(order.getStartDate());
-
-        orderDetailDTO.setUpdateTime(order.getUpdateTime());
+        orderDetailDTO.setUpdate(order.getUpdate());
         orderDetailDTO.setUserId(order.getUserId());
         orderDetailDTO.setVendorId(order.getVendorId());
+        orderDetailDTO.setEndDate(order.getEndDate());
+        orderDetailDTO.setDescription(policy.getDescription());
+        orderDetailDTO.setCoverage(policy.getCoverage());
+
 
         return orderDetailDTO;
+    }
+
+    public OrderDetailDTO getOrderDetailByPetId(int petId){
+        OrderDetailDTO orderDetailDTO = orderMapper.selectByPetId(petId);
+        int orderId = orderDetailDTO.getOrderId();
+        return getOrderDetailByPolicyId(orderId);
+
     }
 
 
@@ -122,5 +132,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
 
         return pageInfo;
     }
+
+
 
 }

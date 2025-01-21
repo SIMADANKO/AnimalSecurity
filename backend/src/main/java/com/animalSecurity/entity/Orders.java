@@ -51,10 +51,10 @@ public class Orders implements Serializable {
     private LocalDate endDate;
 
     @ApiModelProperty("订单创建时间")
-    private LocalDateTime createTime;
+    private LocalDate createTime;
 
     @ApiModelProperty("订单更新时间")
-    private LocalDateTime updateTime;
+    private LocalDate updateTime;
 
     public Integer getOrderId() {
         return orderId;
@@ -112,19 +112,19 @@ public class Orders implements Serializable {
         this.endDate = endDate;
     }
 
-    public LocalDateTime getCreateTime() {
+    public LocalDate getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
+    public void setCreateTime(LocalDate createTime) {
         this.createTime = createTime;
     }
 
-    public LocalDateTime getUpdateTime() {
+    public LocalDate getUpdate() {
         return updateTime;
     }
 
-    public void setUpdateTime(LocalDateTime updateTime) {
+    public void setUpdateTime(LocalDate updateTime) {
         this.updateTime = updateTime;
     }
 

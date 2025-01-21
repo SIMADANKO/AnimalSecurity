@@ -1,5 +1,7 @@
 package com.animalSecurity.mapper;
+import com.animalSecurity.dto.OrderDetailDTO;
 import com.animalSecurity.entity.Orders;
+import com.animalSecurity.entity.Users;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -14,5 +16,6 @@ import org.apache.ibatis.annotations.Select;
  */
 
 public interface OrdersMapper extends BaseMapper<Orders> {
-
+    @Select("SELECT * FROM orders WHERE pet_Id = #{petId}")
+    OrderDetailDTO selectByPetId(int petId);
 }

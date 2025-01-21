@@ -66,6 +66,17 @@ public class OrdersController {
         return Result.fail(404, "Order not found.");
     }
 
+    // 用户：查看订单详情
+    @GetMapping("/pet/{id}")
+    public Result<OrderDetailDTO> getOrderByPetId(@PathVariable Integer id) {
+
+        OrderDetailDTO order = orderService.getOrderDetailByPetId(id); // 使用 orderId 查询
+        if (order != null) {
+            return Result.success(order);
+        }
+        return Result.fail(404, "Order not found.");
+    }
+
     // 用户：创建新订单
     @PostMapping
     public Result<String> createOrder(@RequestBody Orders order, Authentication authentication) {
@@ -119,7 +130,6 @@ public class OrdersController {
         return Result.fail(500, "Failed to update order status.");
     }
 
-    // 管理员：查询所有订单
     @GetMapping("/admin")
     public Result<Page<Orders>> getAllOrdersForAdmin(
             @RequestParam Integer page,
@@ -137,6 +147,8 @@ public class OrdersController {
         Page<Orders> ordersPage = orderService.getAllOrders(page, size);
 
         if (ordersPage != null && !ordersPage.getRecords().isEmpty()) {
+            // 返回分页数据，包括当前页记录、总记录数、每页记录数、总页数等信息
+
             return Result.success(ordersPage);
         }
         return Result.fail(404, "No orders found.");

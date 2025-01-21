@@ -25,5 +25,7 @@ public interface IOrdersService extends IService<Orders> {
     boolean checkInsuranceExpiry(LocalDate endDate);
     OrderDetailDTO getOrderDetailByPolicyId(int orderId);
     Page<Orders> getAllOrders(Integer page, Integer size);
+    OrderDetailDTO getOrderDetailByPetId(int petId);
+
 
 }
