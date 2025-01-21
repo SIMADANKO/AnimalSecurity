@@ -9,7 +9,8 @@
           <el-tab-pane label="注文管理" name="orders">
             <div class="orders-section">
               <el-table :data="orders" style="width: 100%" align="center">
-                <el-table-column prop="orderId" label="注文番号" width="120" />
+                <el-table-column prop="orderId" label="注文番号" width="100" />
+                <el-table-column prop="userId" label="お客様番号" width="120" />
                 <el-table-column prop="petId" label="ペットID" width="120" />
                 <!-- <el-table-column prop="petName" label="ペット名" width="120" /> -->
                 <!-- <el-table-column prop="policyName" label="保険プラン" width="150" /> -->
@@ -21,11 +22,12 @@
                   </template>
                 </el-table-column>
                 <el-table-column prop="createTime" label="注文日" width="180" />
-                <!-- <el-table-column prop="price" label="金額" width="120">
+                <el-table-column prop="endDate" label="有効期限" width="180" />
+                 <el-table-column prop="price" label="金額" width="120">
                   <template #default="scope">
-                    ¥{{ scope.row.price }}
+                    ¥{{ scope.row.totalPrice }}
                   </template>
-                </el-table-column> -->
+                </el-table-column>
                 <el-table-column label="操作" width="200">
                   <template #default="scope">
                     <el-button
@@ -115,9 +117,9 @@
           <div class="status-options">
             <el-radio-group v-model="selectedStatus">
               <el-radio-button label="pending">審査中</el-radio-button>
-              <el-radio-button label="active">承認済み</el-radio-button>
-              <el-radio-button label="expired">却下</el-radio-button>
-              <el-radio-button label="cancelled">完了</el-radio-button>
+              <el-radio-button label="active">完了</el-radio-button>
+              <el-radio-button label="expired">期限切れ</el-radio-button>
+              <el-radio-button label="cancelled">取り消し</el-radio-button>
             </el-radio-group>
           </div>
           <template #footer>
@@ -191,12 +193,20 @@
               <span>{{ selectedOrder.orderId }}</span>
             </div>
             <div class="detail-item">
+              <span class="label">お客様番号：</span>
+              <span>{{ selectedOrder.userId }}</span>
+            </div>
+            <div class="detail-item">
               <span class="label">ペット名：</span>
               <span>{{ selectedOrder.petName }}</span>
             </div>
             <div class="detail-item">
               <span class="label">保険プラン：</span>
               <span>{{ selectedOrder.policyName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">補償額：</span>
+              <span>¥{{ selectedOrder.coverage }}</span>
             </div>
             <div class="detail-item">
               <span class="label">状態：</span>
@@ -209,8 +219,16 @@
               <span>{{ selectedOrder.startDate }}</span>
             </div>
             <div class="detail-item">
+              <span class="label">有効期限：</span>
+              <span>{{ selectedOrder.endDate }}</span>
+            </div>
+            <div class="detail-item">
               <span class="label">金額：</span>
               <span>¥{{ selectedOrder.price }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">補償額：</span>
+              <span>¥{{ selectedOrder.coverage }}</span>
             </div>
           </div>
         </el-dialog>
@@ -264,7 +282,7 @@
           loading.value = true;
           const response = await axios.get('http://localhost:8081/orders/admin', {
             params: {
-              page: currentPage.value - 1,
+              page: currentPage.value ,
               size: pageSize.value
             },
             headers: {
@@ -275,6 +293,7 @@
             const data = response.data.data;
             orders.value = data.records;
             total.value = data.total;
+            console.log(data);
           } else {
             this.$message.error(response.data.message || 'Failed to fetch orders');
           }
@@ -327,15 +346,15 @@
     // 判断响应结果
     if (response.data.code === 200) {
       // 使用 ElMessage 显示成功消息
-      ElMessage.success('Order status updated successfully');
+      ElMessage.success('注文状況が正常に更新されました');
       orderStatusDialog.value = false;
       await fetchOrders(); // 刷新订单列表
     } else {
-      ElMessage.error(response.data.message || 'Failed to update order status');
+      ElMessage.error(response.data.message || '注文状況の更新に失敗しました');
     }
   } catch (error) {
     console.error(error);
-    ElMessage.error('An error occurred while updating the order status');
+    ElMessage.error('注文状況の更新に失敗しました');
   }
 };
 
@@ -439,10 +458,10 @@ const deletePolicy = async (policyId) => {
   
       const getOrderStatusText = (status) => {
         const texts = {
-          Pending: '审查中',
-          Active: '完成',
-          Cancelled: '已取消',
-          Expired:'已过期'
+          Pending: '審査中',
+          Active: '完了',
+          Cancelled: 'キャンセル済み',
+          Expired:'期限切れ'
         };
         return texts[status] || status;
       };
