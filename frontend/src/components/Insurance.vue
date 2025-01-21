@@ -68,8 +68,16 @@
                 <el-button 
                   type="danger" 
                   class="action-btn"
-                  @click="confirmDeletePet(pet)">
+                  @click="confirmDeletePet(pet)"
+                  v-if="pet.insuranceStatus !== 'active'">
                   削除
+                </el-button>
+                <el-button 
+                  type="success" 
+                  class="action-btn"
+                  @click="checkInsuranceDetail(pet)"
+                  v-if="pet.insuranceStatus == 'active'">
+                  保険プランを見る
                 </el-button>
 
   <!-- 如果保险状态是active，则显示更新保险按钮 -->
@@ -94,17 +102,26 @@
           
           <div class="orders-table">
             <el-table :data="orders" style="width: 100%" align="center" >
-              <el-table-column prop="orderId" label="注文番号" width="120" />
-              <el-table-column prop="petId" label="ペットID" width="120" />
-              <el-table-column prop="policyId" label="保険プランID " width="200" />
-              <el-table-column prop="orderStatus" label="状態" width="120">
-                <template #default="scope" >
-                  <el-tag :type="getOrderStatusType(scope.row.orderStatus)" >
-                    {{ getOrderStatusText(scope.row.orderStatus) }}
-                  </el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column prop="createTime" label="注文日" width="180" />
+              <el-table-column prop="orderId" label="注文番号" width="100" />
+                <el-table-column prop="userId" label="お客様番号" width="120" />
+                <el-table-column prop="vendorId" label="管理者番号" width="120" />
+                <el-table-column prop="petId" label="ペットID" width="120" />
+                <!-- <el-table-column prop="petName" label="ペット名" width="120" /> -->
+                <!-- <el-table-column prop="policyName" label="保険プラン" width="150" /> -->
+                <el-table-column prop="orderStatus" label="状態" width="120">
+                  <template #default="scope">
+                    <el-tag :type="getOrderStatusType(scope.row.orderStatus)">
+                      {{ getOrderStatusText(scope.row.orderStatus) }}
+                    </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="createTime" label="注文日" width="180" />
+                <el-table-column prop="endDate" label="有効期限" width="180" />
+                 <el-table-column prop="price" label="金額" width="120">
+                  <template #default="scope">
+                    ¥{{ scope.row.totalPrice }}
+                  </template>
+                </el-table-column>
               <el-table-column label="操作" width="120">
                 <template #default="scope">
                   <el-button
@@ -199,38 +216,92 @@
 
       <!-- Order Details Dialog -->
       <el-dialog
-        v-model="orderDetailsDialogVisible"
-        title="注文詳細"
-        width="600px"
+      v-model="checkInsuranceDetailDialog"
+       
+        title="保険詳細"
+        width="500px"
       >
-        <div v-if="selectedOrder" class="order-details">
+        <div v-if="selectedPetPlan" class="order-details">
           <div class="detail-item">
-            <span class="detail-label">注文番号：</span>
-            <span class="detail-value">{{ selectedOrder.orderId }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">ペット名：</span>
-            <span class="detail-value">{{ selectedOrder.petName }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">保険プラン：</span>
-            <span class="detail-value">{{ selectedOrder.policyName }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">状態：</span>
-            <el-tag :type="getOrderStatusType(selectedOrder.orderStatus)">
-              {{ getOrderStatusText(selectedOrder.orderStatus) }}
-            </el-tag>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">注文日：</span>
-            <span class="detail-value">{{ selectedOrder.startDate }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">金額：</span>
-            <span class="detail-value">¥{{ selectedOrder.price }}</span>
-          </div>
+              <span class="label">注文番号：</span>
+              <span>{{ selectedPetPlan.orderId }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">管理者番号：</span>
+              <span>{{ selectedPetPlan.vendorId }}</span>
+            </div>
+          
+            <div class="detail-item">
+              <span class="label">保険プラン：</span>
+              <span>{{ selectedPetPlan.policyName }}</span>
+            </div>
+      
+            <div class="detail-item">
+              <span class="label">状態：</span>
+              <el-tag :type="getOrderStatusType(selectedPetPlan.orderStatus)">
+                {{ getOrderStatusText(selectedPetPlan.orderStatus) }}
+              </el-tag>
+            </div>
+            <div class="detail-item">
+              <span class="label">注文日：</span>
+              <span>{{ selectedPetPlan.startDate }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">有効期限：</span>
+              <span>{{ selectedPetPlan.endDate }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">金額：</span>
+              <span>¥{{ selectedPetPlan.price }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">補償額：</span>
+              <span>¥{{ selectedPetPlan.coverage }}</span>
+            </div>
         </div>
+      </el-dialog>
+      <el-dialog
+      v-model="orderDetailsDialogVisible"
+       
+        title="注文詳細"
+        width="500px">
+        <div  class="order-details">
+      <div class="detail-item">
+              <span class="label">ペット名：</span>
+              <span>{{ selectedOrder.petName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">保険プラン：</span>
+              <span>{{ selectedOrder.policyName }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">補償額：</span>
+              <span>¥{{ selectedOrder.coverage }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">状態：</span>
+              <el-tag :type="getOrderStatusType(selectedOrder.orderStatus)">
+                {{ getOrderStatusText(selectedOrder.orderStatus) }}
+              </el-tag>
+            </div>
+            <div class="detail-item">
+              <span class="label">注文日：</span>
+              <span>{{ selectedOrder.startDate }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">有効期限：</span>
+              <span>{{ selectedOrder.endDate }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">金額：</span>
+              <span>¥{{ selectedOrder.price }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">補償額：</span>
+              <span>¥{{ selectedOrder.coverage }}</span>
+            </div>
+          </div>
+
       </el-dialog>
       <!-- 添加宠物对话框 -->
       <el-dialog 
@@ -263,6 +334,11 @@
               <el-option label="雌性" value="2"></el-option>
             </el-select>
           </el-form-item>
+          <!-- 添加确认和取消按钮 -->
+          <el-form-item>
+            <el-button type="primary" @click="addPet">确认</el-button>
+            <el-button @click="addPetDialogVisible = false">取消</el-button>
+          </el-form-item>
         </el-form>
         <template #footer>
           <span class="dialog-footer">
@@ -276,11 +352,9 @@
 </template>
 
 <script>
-// Script部分保持不变
 import axios from 'axios';
-import { ref, reactive, onMounted,watch} from 'vue';
-import {  ElMessage, ElMessageBox, ElTable, ElTableColumn, ElDialog, ElInput, ElButton, ElSelect } from 'element-plus';
-
+import { ref, reactive, onMounted, watch } from 'vue';
+import { ElMessage, ElMessageBox, ElTable, ElTableColumn, ElDialog, ElInput, ElButton, ElSelect } from 'element-plus';
 
 export default {
   components: {
@@ -302,6 +376,8 @@ export default {
     const orderDetailsDialogVisible = ref(false);
     const editingPet = ref({});
     const selectedOrder = ref(null);
+    const checkInsuranceDetailDialog=ref(false);
+    const selectedPetPlan = ref(null);
     
 
     const newPet = reactive({
@@ -408,6 +484,25 @@ export default {
         });
     };
 
+    const checkInsuranceDetail=async(pet)=>{
+      try {
+        
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const response=await axios.get(`http://localhost:8081/orders/pet/${pet.petId}`, {
+          headers: {
+            Authorization: `${token}`
+          }
+        });
+        checkInsuranceDetailDialog.value=true;
+        selectedPetPlan.value=response.data.data;
+       
+      } catch (error) {
+        console.log(error);
+       
+      }
+    };
+    
+
     // Delete pet
     const deletePet = async (petId) => {
       try {
@@ -470,7 +565,7 @@ export default {
       try {
         
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        const response = await axios.get('http://localhost:8081/pets/list?page=1&size=10', {
+        const response = await axios.get('http://localhost:8081/pets/list?page=1&size=100', {
           
           headers: {
             Authorization: `Bearer ${token}`,
@@ -629,9 +724,12 @@ console.log(order);
       handleOrderPageChange,
       showOrderDetails,
       getOrderStatusType,
-      getOrderStatusText
+      getOrderStatusText,
+      checkInsuranceDetail,
+      selectedPetPlan,
+      checkInsuranceDetailDialog
     };
-  },
+  }
 };
 </script>
 
@@ -856,15 +954,16 @@ body {
   justify-content: center;
 }
 
-.order-details {
-  padding: 1rem;
-}
-
-.detail-item {
-  margin-bottom: 1rem;
-  display: flex;
-  align-items: center;
-}
+.order-details .detail-item {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .order-details .label {
+    width: 120px;
+    color: #606266;
+  }
 
 .detail-label {
   width: 120px;
@@ -876,4 +975,3 @@ body {
   color: #2c3e50;
 }
   </style>
-  
