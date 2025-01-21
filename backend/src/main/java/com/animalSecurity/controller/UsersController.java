@@ -9,11 +9,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.stereotype.Controller;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -37,7 +42,7 @@ public class UsersController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    public Result<String> login(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
+    public Result<Map<String, Object>> login(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
         String username = requestBody.get("username");
         String password = requestBody.get("password");
 
@@ -56,10 +61,22 @@ public class UsersController {
             // 登录成功后生成 JWT
             String token = JwtUtil.generateToken(username);  // 自定义方法生成 JWT
 
+            // 从认证对象中获取用户的角色信息
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            List<String> roles = authorities.stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
+
             // 将 JWT 设置到响应头中
             response.setHeader("Authorization", "Bearer " + token);
 
-            return Result.success("Login successful");
+            // 构造返回结果
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("message", "Login successful");
+            responseData.put("token", token);
+            responseData.put("roles", roles);
+
+            return Result.success(responseData);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.fail(401, "Invalid credentials");
