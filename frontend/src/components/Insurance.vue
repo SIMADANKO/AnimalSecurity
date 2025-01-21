@@ -428,7 +428,7 @@ export default {
     const getOrderStatusType = (status) => {
       const statusMap = {
         'Pending': 'warning',
-        'Completed': 'success',
+        'Active': 'success',
         'Cancelled': 'danger'
       };
       return statusMap[status] || 'info';
@@ -437,8 +437,9 @@ export default {
     const getOrderStatusText = (status) => {
       const statusMap = {
         'Pending': '処理中',
-        'Completed': '完了',
-        'Cancelled': 'キャンセル'
+        'Active': '完了',
+        'Cancelled': 'キャンセル',
+        'Expired':'过期'
       };
       return statusMap[status] || status;
     };
