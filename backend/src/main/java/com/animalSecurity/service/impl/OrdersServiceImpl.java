@@ -111,4 +111,16 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         return orderDetailDTO;
     }
 
+
+    @Override
+    public Page<Orders> getAllOrders(Integer page, Integer size) {
+        // 使用 MyBatis-Plus 提供的分页功能
+        Page<Orders> pageInfo = new Page<>(page, size);
+
+        // 调用 MyBatis-Plus 提供的分页查询方法
+        orderMapper.selectPage(pageInfo, null);
+
+        return pageInfo;
+    }
+
 }

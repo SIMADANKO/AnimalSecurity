@@ -105,7 +105,7 @@ public class OrdersController {
     }
 
     // 管理员：更新订单状态
-    @PutMapping("/{id}/status")
+    @PutMapping("/admin/{id}/status")
     public Result<String> updateOrderStatus(@PathVariable Integer id,
                                             @RequestParam String status,
                                             Authentication authentication) {
@@ -117,5 +117,28 @@ public class OrdersController {
             return Result.success("Order status updated successfully!");
         }
         return Result.fail(500, "Failed to update order status.");
+    }
+
+    // 管理员：查询所有订单
+    @GetMapping("/admin")
+    public Result<Page<Orders>> getAllOrdersForAdmin(
+            @RequestParam Integer page,
+            @RequestParam Integer size,
+            Authentication authentication) {
+
+        // 从 Authentication 验证管理员权限
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) {
+            return Result.fail(403, "Access denied. Only administrators can view all orders.");
+        }
+
+        // 调用服务层方法进行分页查询所有订单
+        Page<Orders> ordersPage = orderService.getAllOrders(page, size);
+
+        if (ordersPage != null && !ordersPage.getRecords().isEmpty()) {
+            return Result.success(ordersPage);
+        }
+        return Result.fail(404, "No orders found.");
     }
 }

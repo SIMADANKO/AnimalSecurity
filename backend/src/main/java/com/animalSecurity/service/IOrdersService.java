@@ -24,5 +24,6 @@ public interface IOrdersService extends IService<Orders> {
     Page<Orders> getAllOrdersByUserId(Integer userId, int page, int size);    //分页查询所有订单
     boolean checkInsuranceExpiry(LocalDate endDate);
     OrderDetailDTO getOrderDetailByPolicyId(int orderId);
+    Page<Orders> getAllOrders(Integer page, Integer size);
 
 }
