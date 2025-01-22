@@ -334,11 +334,7 @@
               <el-option label="雌性" value="2"></el-option>
             </el-select>
           </el-form-item>
-          <!-- 添加确认和取消按钮 -->
-          <el-form-item>
-            <el-button type="primary" @click="addPet">确认</el-button>
-            <el-button @click="addPetDialogVisible = false">取消</el-button>
-          </el-form-item>
+        
         </el-form>
         <template #footer>
           <span class="dialog-footer">
@@ -694,11 +690,7 @@ console.log(order);
         activeTab.value = 'plans';
     }
 
-    onMounted(() => {
-      fetchPets();
-      fetchInsurancePlans();
-    });
-
+   
     return {
       title,
       activeTab,
